@@ -447,7 +447,21 @@ body{
   }
 
 })();
-</body>
+function playBeep(freq=440, dur=0.06, vol=0.06){
+    try{
+        const Ctx = window.AudioContext || window.webkitAudioContext;
+        const ctx = new Ctx();
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.type='sine'; o.frequency.value=freq; g.gain.value=vol;
+        o.connect(g); g.connect(ctx.destination); o.start();
+        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+        setTimeout(()=>{ o.stop(); ctx.close(); }, dur*1000+60);
+    }catch(e){}
+}
+
+})();   <-- این هست، باید بماند
+
+<!-- اینجا هیچ چیز اضافه نکن -->
 
 <script>
 document.getElementById("tgBtn").addEventListener("click", function () {
@@ -456,4 +470,5 @@ document.getElementById("tgBtn").addEventListener("click", function () {
 });
 </script>
 
+</body>
 </html>
