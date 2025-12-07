@@ -190,7 +190,7 @@ body{
               <div class="level-badge">Level <strong id="levelBadge" style="margin-left:8px;color:var(--neon-magenta)">1</strong></div>
             </div>
 
-            <div class="progress" aria-hidden="true" title="Progress to next level">
+            <div class="progress" aria-hidden="true" title="">
               <i id="progFill"></i>
             </div>
 
@@ -205,20 +205,18 @@ body{
           </div>
         </div>
 
-        <a href="https://t.me/Franciszw" target="_blank" rel="noopener noreferrer">
-  <button class="btn" aria-label="telegram">
-    <svg viewBox="0 0 24 24" fill="none" width="22" height="22">
-      <path d="M3 11l18-8-8 18-2-7-8-3z" fill="#000"/>
-    </svg>
-  </button>
-</a>
+        <div class="controls" role="group" aria-label="social links">
+          <button class="btn" id="tgBtn" data-link="https://t.me/Franciszw" aria-label="telegram">
+            <svg viewBox="0 0 24 24" fill="none" width="22" height="22"><path d="M3 11l18-8-8 18-2-7-8-3z" fill="#000"/></svg>
+          </button>
+
           <div style="flex:1"></div>
 
           <div class="level-badge" id="xpPreview">+0 XP</div>
         </div>
 
         <div class="footer" aria-hidden="true" style="margin-top:14px">
-          <div class="small">Progress to next level</div>
+          <div class="small"></div>
           <div class="small">Rank <strong id="rankText" style="color:var(--neon-magenta);margin-left:8px">#999</strong></div>
         </div>
       </div>
@@ -447,28 +445,58 @@ body{
   }
 
 })();
-function playBeep(freq=440, dur=0.06, vol=0.06){
-    try{
-        const Ctx = window.AudioContext || window.webkitAudioContext;
-        const ctx = new Ctx();
-        const o = ctx.createOscillator(), g = ctx.createGain();
-        o.type='sine'; o.frequency.value=freq; g.gain.value=vol;
-        o.connect(g); g.connect(ctx.destination); o.start();
-        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
-        setTimeout(()=>{ o.stop(); ctx.close(); }, dur*1000+60);
-    }catch(e){}
-}
-
-})();   <-- این هست، باید بماند
-
-<!-- اینجا هیچ چیز اضافه نکن -->
-
+</script>
 <script>
-document.getElementById("tgBtn").addEventListener("click", function () {
-    const url = this.dataset.link;
-    window.open(url, "_blank");
+document.addEventListener("DOMContentLoaded", function () {
+  try {
+    // debug: مطمئن شو اسکریپت لود شده
+    console.log("init: attaching handlers");
+
+    // اجبار فعال بودن pointer-events روی controls (در صورت وجود overlay)
+    const controls = document.querySelector('.controls');
+    if (controls) {
+      controls.style.pointerEvents = 'auto';
+      controls.style.zIndex = 10;
+    }
+
+    // addXp قبلاً listener داره ولی چک کنیم
+    const addXp = document.getElementById('addXp');
+    if (addXp) {
+      addXp.addEventListener('click', function () {
+        console.log('addXp clicked');
+      }, { once: false });
+    } else {
+      console.warn('addXp not found');
+    }
+
+    // tgBtn: handler اضافه می‌کنیم و لینک را باز می‌کنیم
+    const tgBtn = document.getElementById('tgBtn');
+    if (tgBtn) {
+      tgBtn.addEventListener('click', function (e) {
+        e.preventDefault && e.preventDefault();
+        const url = String(this.dataset.link || '').trim();
+        console.log('tgBtn clicked, url=', url);
+        if (!url) {
+          alert('لینک تلگرام تنظیم نشده (data-link خالی است).');
+          return;
+        }
+        // باز کردن در تب جدید
+        window.open(url, '_blank', 'noopener,noreferrer');
+      });
+    } else {
+      console.warn('tgBtn not found');
+    }
+
+    // تست سریع: آیا دکمه‌ها قابل کلیک هستند؟ (توی DOM)
+    console.log('buttons status:', {
+      addXpExists: !!addXp,
+      tgBtnExists: !!tgBtn
+    });
+
+  } catch (err) {
+    console.error('init error:', err);
+  }
 });
 </script>
-
 </body>
 </html>
